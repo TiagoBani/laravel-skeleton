@@ -1,0 +1,41 @@
+version: '2'
+services:
+    application:
+        build: code
+        volumes:
+            - ./application:/var/www/laravel
+            - ./logs/laravel:/var/www/laravel/storage/logs
+        tty: true
+    php:
+        build: php
+        user: "1000:1000"
+        environment:
+            MAIL_ENCRYPTION: 0
+            MAIL_PRETEND: 0
+            MAIL_USERNAME: null
+            MAIL_PASSWORD: null
+        volumes:
+            - ./application:/var/www/laravel
+        links:
+            - db
+    nginx:
+        build: nginx
+        volumes_from:
+           - application
+        volumes:
+            - ./logs/nginx/:/var/log/nginx
+        ports:
+            - 8280:80
+        links:
+            - php
+    db:
+        image: mysql:8
+        volumes:
+            - ./db:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_DATABASE: homestead
+            MYSQL_USER: preview
+            MYSQL_PASSWORD: secret
+        ports:
+            - 8206:3306
