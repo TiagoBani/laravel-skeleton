@@ -1,33 +1,33 @@
 version: '2'
 services:
-    application:
-        build: code
+    src:
+        image: alpine:3.11
         volumes:
-            - ./application:/var/www/laravel
+            - ./src:/var/www/laravel
             - ./logs/laravel:/var/www/laravel/storage/logs
         tty: true
-    php:
-        build: php
-        user: "1000:1000"
+    app:
+        build: app
+        # user: "1000:1000"
         environment:
             MAIL_ENCRYPTION: 0
             MAIL_PRETEND: 0
             MAIL_USERNAME: null
             MAIL_PASSWORD: null
         volumes:
-            - ./application:/var/www/laravel
+            - ./src:/var/www/laravel
         links:
             - db
     nginx:
         build: nginx
         volumes_from:
-           - application
+           - src
         volumes:
             - ./logs/nginx/:/var/log/nginx
         ports:
             - 8280:80
         links:
-            - php
+            - app
     db:
         image: mysql:8
         volumes:

@@ -1,18 +1,15 @@
-FROM debian:9
+FROM nginx:1.19-alpine
 
-RUN apt-get update && apt-get install -y nginx
+RUN rm -rf /var/cache/apk/*
 
-ADD nginx.conf /etc/nginx/
-ADD laravel.conf /etc/nginx/sites-available/
+ADD nginx.conf /etc/nginx/nginx.conf
+ADD laravel.conf /etc/nginx/conf.d/default.conf
 
-RUN ln -s /etc/nginx/sites-available/laravel.conf /etc/nginx/sites-enabled/laravel
-RUN rm /etc/nginx/sites-enabled/default
+RUN echo "upstream php-upstream { server app:9000; }" > /etc/nginx/conf.d/upstream.conf
 
-RUN echo "upstream php-upstream { server php:9000; }" > /etc/nginx/conf.d/upstream.conf
+# RUN usermod -u 1000 www-data
 
-RUN usermod -u 1000 www-data
-
-CMD ["nginx"]
+# CMD ["nginx"]
 
 EXPOSE 80
 EXPOSE 443
